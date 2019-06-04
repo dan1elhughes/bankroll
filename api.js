@@ -14,16 +14,18 @@ module.exports = class API {
 
   async deposit(name, amount) {
     const { pots } = await this.pots();
-    const potId = pots.find(pot => pot.name === name);
+    const pot = pots.find(pot => pot.name === name);
 
-    if (!potId) throw new Error("Pot not found");
+    if (!pot) throw new Error("Pot not found");
+
+    const { id } = pot;
 
     const bodyParams = {
       amount,
       source_account_id: this.accountId,
       dedupe_id: new Date().getTime()
     };
-    return this.request("PUT", `/pots/${potId}/deposit`, {
+    return this.request("PUT", `/pots/${id}/deposit`, {
       bodyParams
     });
   }
