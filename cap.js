@@ -1,27 +1,8 @@
 const API = require("./api");
 const assert = require("assert");
+const { CAP, DESTINATION_POT } = require("./env");
 
-module.exports = async () => {
-  const {
-    ACCESS_TOKEN,
-    ACCOUNT_ID,
-    ACCOUNT_NUMBER,
-    CAP,
-    DESTINATION_POT_ID,
-    SORT_CODE
-  } = process.env;
-  assert(ACCESS_TOKEN);
-  assert(ACCOUNT_ID);
-  assert(ACCOUNT_NUMBER);
-  assert(CAP);
-  assert(DESTINATION_POT_ID);
-  assert(SORT_CODE);
-
-  const monzo = new API({
-    accessToken: ACCESS_TOKEN,
-    accountId: ACCOUNT_ID
-  });
-
+module.exports = async monzo => {
   const { balance } = await monzo.balance();
   assert(balance);
 
@@ -35,6 +16,6 @@ module.exports = async () => {
     return;
   }
 
-  await monzo.deposit(DESTINATION_POT_ID, excess);
-  console.log(`Swept ${excess} into ${DESTINATION_POT_ID}`);
+  await monzo.deposit(DESTINATION_POT, excess);
+  console.log(`Swept ${excess / 100} into ${DESTINATION_POT}`);
 };

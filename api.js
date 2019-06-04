@@ -3,28 +3,37 @@ const FormData = require("form-data");
 const API_BASE = "https://api.monzo.com";
 
 module.exports = class API {
-  constructor({ accessToken, accountId }) {
-    this.accessToken = accessToken;
-    this.accountId = accountId;
+  constructor({ ACCESS_TOKEN, ACCOUNT_ID }) {
+    this.accessToken = ACCESS_TOKEN;
+    this.accountId = ACCOUNT_ID;
   }
 
   get defaultQueryParams() {
     return { account_id: this.accountId };
   }
 
-  async deposit(pot, amount) {
+  async deposit(name, amount) {
+    const { pots } = await this.pots();
+    const potId = pots.find(pot => pot.name === name);
+
+    if (!potId) throw new Error("Pot not found");
+
     const bodyParams = {
       amount,
       source_account_id: this.accountId,
       dedupe_id: new Date().getTime()
     };
-    return this.request("PUT", `/pots/${pot}/deposit`, {
+    return this.request("PUT", `/pots/${potId}/deposit`, {
       bodyParams
     });
   }
 
   async balance() {
     return this.request("GET", "/balance");
+  }
+
+  async pots() {
+    return this.request("GET", "/pots");
   }
 
   async request(method, route, { queryParams = {}, bodyParams = {} } = {}) {

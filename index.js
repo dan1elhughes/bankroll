@@ -1,14 +1,14 @@
 const micro = require("micro");
 const { router, post } = require("microrouter");
 const cap = require("./cap");
+const env = require("./env");
+const API = require("./api");
 
-if (process.env.NODE_ENV !== "production") {
-  require("dotenv").config();
-}
+const client = new API(env);
 
 module.exports = router(
   post("/webhook", async (req, res) => {
-    await cap();
+    await cap(client);
 
     return "OK";
   })
