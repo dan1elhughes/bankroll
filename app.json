@@ -1,0 +1,20 @@
+{
+  "name": "Salary sweep",
+  "description": "Caps a Monzo account to a certain amount, sweeping any excess into a specified Pot.",
+  "website": "https://github.com/dan1elhughes/salary-sweep",
+  "env": {
+    "ACCESS_TOKEN": {
+      "description": "Your access token from developers.monzo.com."
+    },
+    "ACCOUNT_ID": {
+      "description": "Your account ID from developers.monzo.com."
+    },
+    "CAP": {
+      "description": "The amount to cap your current account to (GBP).",
+      "value": "3000"
+    },
+    "DESTINATION_POT": {
+      "description": "The name of the pot to send the excess to."
+    }
+  }
+}
