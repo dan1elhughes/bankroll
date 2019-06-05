@@ -15,6 +15,9 @@
     },
     "DESTINATION_POT": {
       "description": "The name of the pot to send the excess to."
+    },
+    "HEROKU_APP_NAME": {
+      "required": true
     }
   }
 }

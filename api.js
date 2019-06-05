@@ -34,6 +34,24 @@ module.exports = class API {
     return this.request("GET", "/balance");
   }
 
+  async webhooks() {
+    return this.request("GET", "/webhooks");
+  }
+
+  async registerWebhook(url) {
+    const bodyParams = {
+      account_id: this.accountId,
+      url
+    };
+    return this.request("POST", "/webhooks", {
+      bodyParams
+    });
+  }
+
+  async deleteWebhook(id) {
+    return this.request("DELETE", `/webhooks/${id}`);
+  }
+
   async pots() {
     return this.request("GET", "/pots");
   }
@@ -59,7 +77,7 @@ module.exports = class API {
     const url = API_BASE + route + "?" + queryParamsResult.toString();
     const body = method === "GET" ? undefined : bodyParamsResult;
 
-    console.log(`${method} ${url}`);
+    console.log(`\t${method} ${url}`);
 
     const res = await fetch(url, {
       method,
