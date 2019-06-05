@@ -1,7 +1,7 @@
 {
-  "name": "Salary sweep",
+  "name": "monzo-balance-manager",
   "description": "Caps a Monzo account to a certain amount, sweeping any excess into a specified Pot.",
-  "website": "https://github.com/dan1elhughes/salary-sweep",
+  "website": "https://github.com/dan1elhughes/monzo-balance-manager",
   "env": {
     "ACCESS_TOKEN": {
       "description": "Your access token from developers.monzo.com."

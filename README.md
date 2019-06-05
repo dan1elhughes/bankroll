@@ -1,4 +1,4 @@
-# Salary sweep
+# Monzo balance manager
 
 > Caps a Monzo account to a certain amount, sweeping any excess into a specified Pot.
 
