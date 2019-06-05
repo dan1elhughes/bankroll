@@ -2,6 +2,8 @@
 
 > Caps a Monzo account to a certain amount, sweeping any excess into a specified Pot.
 
+A webhook is registered automatically, so the account cap can be checked on every transaction event.
+
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
 ## Usage
@@ -24,7 +26,3 @@ DESTINATION_POT="" # The name of the pot to send the excess to.
 ```bash
 $ curl -X POST your-app.herokuapp.com/webhook
 ```
-
-## Todo
-
-- Register the webhook automatically.
