@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "micro -l tcp://0.0.0.0:${PORT-3000}"
+    "start": "micro -l tcp://0.0.0.0:$PORT",
+    "local": "micro"
   },
   "keywords": [],
   "author": "",
