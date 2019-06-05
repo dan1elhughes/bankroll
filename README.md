@@ -6,16 +6,20 @@
 
 ## Usage
 
-Set the required variables in setup:
+- Create an account at https://developers.monzo.com.
 
-```
-ACCESS_TOKEN=""
-ACCOUNT_ID=""
-CAP=""
-DESTINATION_POT=""
+- Click the button above.
+
+- Set the required variables in setup as prompted:
+
+```bash
+ACCESS_TOKEN="" # Your access token from developers.monzo.com
+ACCOUNT_ID="" #Your account ID from developers.monzo.com
+CAP="" # The amount to cap your current account to (GBP).
+DESTINATION_POT="" # The name of the pot to send the excess to.
 ```
 
-Make a POST request to /webhook:
+- Make a POST request to /webhook:
 
 ```bash
 $ curl -X POST your-app.herokuapp.com/webhook
