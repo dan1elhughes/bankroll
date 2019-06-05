@@ -13,3 +13,14 @@ module.exports = router(
     return "OK";
   })
 );
+
+setTimeout(async function() {
+  console.log("Testing API connection...");
+  try {
+    await client.balance();
+  } catch (e) {
+    console.error("Unable to connect: ", e);
+    process.exit(1);
+  }
+  console.log("API connected");
+}, 500);

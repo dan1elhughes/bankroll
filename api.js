@@ -67,6 +67,10 @@ module.exports = class API {
       headers
     });
 
-    return res.json();
+    if (res.ok) {
+      return res.json();
+    } else {
+      return Promise.reject(res.statusText);
+    }
   }
 };
