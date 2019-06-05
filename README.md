@@ -18,7 +18,7 @@ DESTINATION_POT=""
 Make a POST request to /webhook:
 
 ```bash
-$ http POST your-app.herokuapp.com/webhook
+$ curl -X POST your-app.herokuapp.com/webhook
 ```
 
 ## Todo
