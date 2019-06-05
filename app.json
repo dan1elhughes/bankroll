@@ -3,6 +3,10 @@
   "description": "Caps a Monzo account to a certain amount, sweeping any excess into a specified Pot.",
   "website": "https://github.com/dan1elhughes/monzo-balance-manager",
   "env": {
+    "APP_NAME": {
+      "description": "The same as app-name above.",
+      "required": true
+    },
     "ACCESS_TOKEN": {
       "description": "Your access token from developers.monzo.com."
     },
@@ -15,9 +19,6 @@
     },
     "DESTINATION_POT": {
       "description": "The name of the pot to send the excess to."
-    },
-    "HEROKU_APP_NAME": {
-      "required": true
     }
   }
 }

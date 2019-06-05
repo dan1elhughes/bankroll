@@ -7,6 +7,7 @@ if (process.env.NODE_ENV !== "production") {
 const requiredEnvironmentVariables = [
   "ACCESS_TOKEN",
   "ACCOUNT_ID",
+  "APP_NAME",
   "CAP",
   "DESTINATION_POT"
 ];

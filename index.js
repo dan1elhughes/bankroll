@@ -25,8 +25,9 @@ setTimeout(async function() {
   }
   console.log("API connected");
 
-  if (!process.env.HEROKU_APP_NAME) {
-    console.log(`HEROKU_APP_NAME unset, skipping webhook registration`);
+  const { APP_NAME } = env;
+  if (!APP_NAME) {
+    console.log(`APP_NAME unset, skipping webhook registration`);
     return;
   }
 
@@ -34,7 +35,7 @@ setTimeout(async function() {
   try {
     await registerWebhook(client, {
       clean: true,
-      url: `https://${process.env.HEROKU_APP_NAME}/webhook`
+      url: `https://${APP_NAME}.herokuapp.com/webhook`
     });
   } catch (e) {
     console.error("Unable to register webhook: ", e);
