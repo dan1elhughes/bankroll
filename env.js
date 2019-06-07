@@ -1,15 +1,10 @@
 const assert = require("assert");
 
-if (process.env.NODE_ENV !== "production") {
-  require("dotenv").config();
-}
-
 const requiredEnvironmentVariables = [
-  "ACCESS_TOKEN",
-  "ACCOUNT_ID",
   "APP_NAME",
-  "CAP",
-  "DESTINATION_POT"
+  "CLIENT_ID",
+  "CLIENT_SECRET",
+  "DATABASE_URL"
 ];
 
 requiredEnvironmentVariables.forEach(name => {
