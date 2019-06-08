@@ -1,27 +1,47 @@
+// Pre-checked environment variables
+const env = require("./env");
+
+// Routing
 const micro = require("micro");
 const { router, post, get } = require("microrouter");
-const cap = require("./cap");
-const env = require("./env");
+
+// Database models
 const database = require("./database");
 const { State, User } = require("./models");
+
+// External API classes
 const { API, OAuth } = require("./api");
+
+// HTTP utils
 const redirect = require("./micro/redirect");
 const query = require("./micro/query");
+const bail = require("./micro/bail");
 
+// Helpers (todo)
+const registerWebhook = require("./registerWebhook");
+
+// Boot setup
 database.sync();
 const oauth = new OAuth(env);
 
-const bail = str => {
-  error = new Error(str);
-  error.statusCode = 400;
-  throw error;
-};
-
 module.exports = router(
   post("/webhook", async (req, res) => {
-    await cap(client);
+    const body = await micro.json(req);
+    const { account_id } = body.data;
+    const user = await User.findOne({ where: { account_id } });
+    if (!user) bail(`No user found for account ${account_id}`);
 
-    return "OK";
+    const api = new API(user, env);
+
+    const { balance } = await api.balance();
+    const { cap, pot } = user;
+
+    const excess = balance - cap;
+    if (excess <= 0) return "ok";
+
+    await api.deposit(pot, excess);
+
+    return "ok";
   }),
 
   get("/oauth/callback", async (req, res) => {
@@ -31,20 +51,44 @@ module.exports = router(
     if (!state) bail('Missing query parameter "state"');
     if (!(await oauth.validateState(state))) bail("Failed state check");
 
-    const { access_token, refresh_token, user_id } = await oauth.redeemAuthCode(
-      code
-    );
+    const {
+      access_token,
+      expires_in,
+      refresh_token,
+      user_id
+    } = await oauth.redeemAuthCode(code);
 
-    const api = new API(access_token, env);
+    let api = new API({ access_token }, env);
 
     const { accounts } = await api.accounts({ account_type: "uk_retail" });
     const [mainAccount] = accounts;
     const { id: account_id } = mainAccount;
 
-    const [user, created] = await User.findOrCreate({
-      where: { id: user_id },
-      defaults: { access_token, refresh_token, account_id }
-    });
+    const existingUser = await User.findOne({ where: { id: user_id } });
+
+    const expires = new Date();
+    expires.setSeconds(expires.getSeconds() + expires_in);
+
+    const fields = { access_token, account_id, expires, refresh_token };
+
+    if (existingUser) {
+      await existingUser.update(fields);
+    } else {
+      await User.create({
+        id: user_id,
+        ...fields
+      });
+    }
+
+    // TODO: This API reassignment once we have more data needs sorting out.
+    api = new API(fields, env);
+
+    console.log(
+      await registerWebhook(api, {
+        clean: true,
+        url: oauth.getAppURL() + "/webhook"
+      })
+    );
 
     await api.createFeedItem({
       account_id,
@@ -55,7 +99,7 @@ module.exports = router(
         "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/apple/198/white-heavy-check-mark_2705.png"
     });
 
-    return { created };
+    return { connected: true };
   }),
 
   get("/", async (req, res) => {

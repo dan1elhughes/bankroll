@@ -5,7 +5,10 @@
   "main": "index.js",
   "scripts": {
     "start": "micro -l tcp://0.0.0.0:$PORT",
-    "local": "nodemon --exec micro-dev"
+    "local": "nodemon --exec micro-dev",
+    "local:refresh-tokens": "node -r dotenv/config tasks/refresh_tokens.js",
+    "tasks:refresh-tokens": "node tasks/refresh_tokens.js",
+    "local:send-webhook": "http POST localhost:3000/webhook < sample-data/webhook.json"
   },
   "keywords": [],
   "author": "",
@@ -22,6 +25,7 @@
     "uuid": "^3.3.2"
   },
   "devDependencies": {
+    "dotenv": "^8.0.0",
     "micro-dev": "^3.0.0",
     "nodemon": "^1.19.1"
   }

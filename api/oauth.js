@@ -45,7 +45,9 @@ module.exports = class OAuth extends Base {
       redirect_uri: this.getAppURL() + "/oauth/callback",
       code
     });
+
     console.log({ url, method, body });
+
     const res = await fetch(url, { method, body });
     return res.json();
   }

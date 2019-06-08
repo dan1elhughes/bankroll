@@ -1,4 +1,4 @@
-module.exports = function(res, statusCode, location) {
+module.exports = (res, statusCode, location) => {
   if (!res) {
     throw new Error("Response object required");
   }
