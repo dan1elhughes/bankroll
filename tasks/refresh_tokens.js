@@ -4,7 +4,7 @@ const bail = require("../micro/bail");
 const { API } = require("../api");
 
 // This should be double the frequency of the task.
-const refreshIfExpiresInHours = 12;
+const refreshIfExpiresInHours = 48;
 
 async function updateTokensFromRefreshToken(user) {
   const api = new API(user, process.env);
