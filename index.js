@@ -83,12 +83,10 @@ module.exports = router(
     // TODO: This API reassignment once we have more data needs sorting out.
     api = new API(fields, env);
 
-    console.log(
-      await registerWebhook(api, {
-        clean: true,
-        url: oauth.getAppURL() + "/webhook"
-      })
-    );
+    await registerWebhook(api, {
+      clean: true,
+      url: oauth.getAppURL() + "/webhook"
+    });
 
     await api.createFeedItem({
       account_id,
