@@ -1,6 +1,6 @@
 const fetch = require("node-fetch");
 
-const Base = require("./Base");
+const Base = require("./base");
 
 const API_BASE = "https://api.monzo.com";
 

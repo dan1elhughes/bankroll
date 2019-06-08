@@ -1,4 +1,4 @@
-const Sequelize = require("Sequelize");
+const Sequelize = require("sequelize");
 const db = require("../database");
 const uuid = require("uuid/v4");
 
