@@ -4,7 +4,8 @@ const requiredEnvironmentVariables = [
   "APP_NAME",
   "CLIENT_ID",
   "CLIENT_SECRET",
-  "DATABASE_URL"
+  "DATABASE_URL",
+  "NODE_ENV"
 ];
 
 requiredEnvironmentVariables.forEach(name => {
