@@ -89,7 +89,7 @@ module.exports = class API extends Base {
     const url = API_BASE + route + "?" + queryParamsResult.toString();
     const body = method === "GET" ? undefined : bodyParamsResult;
 
-    console.log({ url, method, body });
+    this.logRequest({ url, method, body });
 
     const res = await fetch(url, {
       method,

@@ -46,7 +46,7 @@ module.exports = class OAuth extends Base {
       code
     });
 
-    console.log({ url, method, body });
+    this.logRequest({ url, method, body });
 
     const res = await fetch(url, { method, body });
     return res.json();
