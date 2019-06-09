@@ -12,6 +12,7 @@ const { State, User } = require("./models");
 // Queue and jobs
 const Queue = require("better-queue");
 const capBalance = require("./jobs/cap-balance");
+const sendNotification = require("./jobs/send-notification");
 
 // External API classes
 const { API, OAuth } = require("./api");

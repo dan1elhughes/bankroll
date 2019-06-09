@@ -2,7 +2,7 @@ const { API } = require("../api");
 const env = require("../env");
 
 const amountToString = amount => {
-  const pounds = amounts / 100;
+  const pounds = amount / 100;
   if (Number.isInteger(pounds)) {
     return `£${pounds}`;
   } else {
