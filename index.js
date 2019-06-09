@@ -33,13 +33,17 @@ database.sync();
 const oauth = new OAuth(env);
 
 // Serial queue setup
-
-const capQueue = new Queue(function(user, done) {
+const capQueue = new Queue(async function(user, done) {
   console.log("Processing queue item...");
-  sleep(1000)
-    .then(() => capBalance(user))
-    .then(() => done())
-    .catch(err => done(err));
+  await sleep(1000);
+
+  try {
+    const excess = await capBalance(user);
+    await sendNotification(user, excess);
+    done();
+  } catch (e) {
+    done(e);
+  }
 });
 
 module.exports = router(
@@ -109,8 +113,7 @@ module.exports = router(
       type: "basic",
       "params[title]": "Balance manager connected",
       "params[body]": "Authorized successfully",
-      "params[image_url]":
-        "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/apple/198/white-heavy-check-mark_2705.png"
+      "params[image_url]": "https://i.imgur.com/tONcN2I.png"
     });
 
     return { connected: true };
