@@ -1,3 +1,4 @@
+const assert = require("assert");
 const fetch = require("node-fetch");
 
 const Base = require("./base");
@@ -6,6 +7,8 @@ const API_BASE = "https://api.monzo.com";
 
 module.exports = class API extends Base {
   constructor(user, { CLIENT_ID, CLIENT_SECRET }) {
+    assert(CLIENT_ID);
+    assert(CLIENT_SECRET);
     super();
     this.user = user;
     this.clientId = CLIENT_ID;

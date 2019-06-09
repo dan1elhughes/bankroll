@@ -9,6 +9,10 @@ const { router, post, get } = require("microrouter");
 const database = require("./database");
 const { State, User } = require("./models");
 
+// Queue and jobs
+const Queue = require("better-queue");
+const capBalance = require("./jobs/cap-balance");
+
 // External API classes
 const { API, OAuth } = require("./api");
 
@@ -20,9 +24,22 @@ const bail = require("./micro/bail");
 // Helpers (todo)
 const registerWebhook = require("./registerWebhook");
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 // Boot setup
 database.sync();
 const oauth = new OAuth(env);
+
+// Serial queue setup
+
+const capQueue = new Queue(function(user, done) {
+  console.log("Processing queue item...");
+  capBalance(user)
+    .then(() => done())
+    .catch(err => done(err));
+});
 
 module.exports = router(
   post("/webhook", async (req, res) => {
@@ -33,15 +50,11 @@ module.exports = router(
     const user = await User.findOne({ where: { account_id } });
     if (!user) bail(`No user found for account ${account_id}`);
 
-    const api = new API(user, env);
-
-    const { balance } = await api.balance();
-    const { cap, pot } = user;
-
-    const excess = balance - cap;
-    if (excess <= 0) return "ok";
-
-    await api.deposit(pot, excess);
+    // This is queued because we receive two webhooks
+    // instead of one due to a bug. This queue has a
+    // concurrency of one, meaning we finish processing
+    // one webhook before starting on the next.
+    capQueue.push(user.get({ plain: true }));
 
     return "ok";
   }),

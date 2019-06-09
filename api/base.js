@@ -9,7 +9,7 @@ module.exports = class Base {
     return result;
   }
 
-  logRequest({ url, method, body }) {
+  logRequest({ url, method, body = "" }) {
     if (NODE_ENV === "development") {
       console.log(`\t:: ${method} ${url} (${body})`);
     } else {
