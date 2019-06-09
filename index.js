@@ -39,8 +39,8 @@ const capQueue = new Queue(async function(user, done) {
   await sleep(1000);
 
   try {
-    const excess = await capBalance(user);
-    await sendNotification(user, excess);
+    const amountMoved = await capBalance(user);
+    if (amountMoved > 0) await sendNotification(user, excess);
     done();
   } catch (e) {
     done(e);
