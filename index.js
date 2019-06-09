@@ -36,7 +36,8 @@ const oauth = new OAuth(env);
 
 const capQueue = new Queue(function(user, done) {
   console.log("Processing queue item...");
-  capBalance(user)
+  sleep(1000)
+    .then(() => capBalance(user))
     .then(() => done())
     .catch(err => done(err));
 });
