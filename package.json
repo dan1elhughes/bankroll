@@ -8,6 +8,8 @@
     "local": "nodemon --exec micro-dev",
     "local:refresh-tokens": "node -r dotenv/config tasks/refresh_tokens.js",
     "tasks:refresh-tokens": "node tasks/refresh_tokens.js",
+    "local:clear-hanging-auths": "node -r dotenv/config tasks/clear_hanging_auths.js",
+    "tasks:clear-hanging-auths": "node tasks/clear_hanging_auths.js",
     "local:send-webhook": "http POST localhost:3000/webhook < sample-data/webhook.json"
   },
   "keywords": [],
