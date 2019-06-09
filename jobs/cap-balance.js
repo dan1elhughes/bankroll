@@ -8,7 +8,7 @@ module.exports = async user => {
   const { balance } = await api.balance();
 
   const excess = balance - cap;
-  if (excess <= 0) return;
+  if (excess <= 0) return 0;
   await api.deposit(pot, excess);
   return excess;
 };
