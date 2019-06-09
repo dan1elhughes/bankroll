@@ -27,8 +27,9 @@ const oauth = new OAuth(env);
 module.exports = router(
   post("/webhook", async (req, res) => {
     const body = await micro.json(req);
+    console.log(`Webhook triggered for transaction: ${body.data.id}`);
+
     const { account_id } = body.data;
-    console.log(body);
     const user = await User.findOne({ where: { account_id } });
     if (!user) bail(`No user found for account ${account_id}`);
 

@@ -11,9 +11,9 @@ module.exports = class Base {
 
   logRequest({ url, method, body }) {
     if (NODE_ENV === "development") {
-      console.log(`\t${method} ${url} (${body})`);
+      console.log(`\t:: ${method} ${url} (${body})`);
     } else {
-      console.log(`\t${method} ${url}`);
+      console.log(`\t:: ${method} ${url}`);
     }
   }
 };
