@@ -1,28 +1,6 @@
-# Monzo balance manager
+**This used to be deployable to Heroku, but it became too specific to be cleanly open sourced. I'm leaving it open in case it's useful to anyone.**
 
-> Caps a Monzo account to a certain amount, sweeping any excess into a specified Pot.
+# Bankroll
 
-A webhook is registered automatically, so the account cap can be checked on every transaction event.
-
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
-
-## Usage
-
-- Create an account at https://developers.monzo.com.
-
-- Click the button above.
-
-- Set the required variables in setup as prompted:
-
-```bash
-ACCESS_TOKEN="" # Your access token from developers.monzo.com
-ACCOUNT_ID="" #Your account ID from developers.monzo.com
-CAP="" # The amount to cap your current account to (GBP).
-DESTINATION_POT="" # The name of the pot to send the excess to.
-```
-
-- Make a POST request to /webhook:
-
-```bash
-$ curl -X POST your-app.herokuapp.com/webhook
-```
+- Caps my current account to a certain amount, sweeping any excess into a specified savings account.
+- _TODO_: Automatically saves the right amount on credit card transactions for my separate credit card account.

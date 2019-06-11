@@ -4,7 +4,7 @@ const env = require("../env");
 module.exports = async user => {
   const { cap, pot } = user;
 
-  const api = new API(user, env);
+  const api = user.getMonzoClient();
   const { balance } = await api.balance();
 
   const excess = balance - cap;

@@ -2,9 +2,9 @@ const assert = require("assert");
 
 const requiredEnvironmentVariables = [
   "APP_NAME",
-  "CLIENT_ID",
-  "CLIENT_SECRET",
   "DATABASE_URL",
+  "MONZO_CLIENT_ID",
+  "MONZO_CLIENT_SECRET",
   "NODE_ENV"
 ];
 

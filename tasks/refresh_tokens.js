@@ -1,27 +1,32 @@
 const { Op } = require("sequelize");
 const { User, State } = require("../models");
 const bail = require("../micro/bail");
-const { API } = require("../api");
+const OAuth = require("../oauth");
+const env = require("../env");
 
 // This should be double the frequency of the task.
 const refreshIfExpiresInHours = 2;
 
-async function updateTokensFromRefreshToken(user) {
-  const api = new API(user, process.env);
+async function updateMonzoTokens(user) {
+  const oauthClient = new OAuth.Monzo({
+    client_id: env.MONZO_CLIENT_ID,
+    client_secret: env.MONZO_CLIENT_SECRET
+  });
+
   const {
     access_token,
     expires_in,
     refresh_token,
     user_id
-  } = await api.refreshToken(user.refresh_token);
+  } = await oauthClient.refreshToken(user.monzo_refresh_token);
 
   const expires = new Date();
   expires.setSeconds(expires.getSeconds() + expires_in);
 
   const fields = {
-    access_token,
-    expires,
-    refresh_token
+    monzo_access_token: access_token,
+    monzo_expires: expires,
+    monzo_refresh_token: refresh_token
   };
 
   if (user.id !== user_id) {
@@ -35,15 +40,15 @@ async function updateTokensFromRefreshToken(user) {
 
 async function main() {
   const deadline = new Date();
-  deadline.setHours(deadline.getHours() + refreshIfExpiresInHours);
+  deadline.setHours(deadline.getHours() + 9999);
 
   const usersExpiringSoon = await User.findAll({
-    where: { expires: { [Op.lte]: deadline } }
+    where: { monzo_expires: { [Op.lte]: deadline } }
   });
 
-  console.log(`${usersExpiringSoon.length} tokens to refresh`);
+  console.log(`${usersExpiringSoon.length} Monzo tokens to refresh`);
 
-  usersExpiringSoon.forEach(updateTokensFromRefreshToken);
+  usersExpiringSoon.forEach(updateMonzoTokens);
 }
 
 main();

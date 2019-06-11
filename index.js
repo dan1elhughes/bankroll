@@ -3,19 +3,22 @@ const env = require("./env");
 
 // Routing
 const micro = require("micro");
-const { router, post, get } = require("microrouter");
+const { withNamespace, router, post, get } = require("microrouter");
 
 // Database models
 const database = require("./database");
 const { State, User } = require("./models");
 
+// OAuth clients
+const OAuth = require("./oauth");
+
+// API clients
+const API = require("./api");
+
 // Queue and jobs
 const Queue = require("better-queue");
 const capBalance = require("./jobs/cap-balance");
 const sendNotification = require("./jobs/send-notification");
-
-// External API classes
-const { API, OAuth } = require("./api");
 
 // HTTP utils
 const redirect = require("./micro/redirect");
@@ -24,6 +27,7 @@ const bail = require("./micro/bail");
 
 // Helpers (todo)
 const registerWebhook = require("./registerWebhook");
+const { getAppUrl } = require("./utils");
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -31,11 +35,19 @@ function sleep(ms) {
 
 // Boot setup
 database.sync();
-const oauth = new OAuth(env);
+
+const monzoOAuth = new OAuth.Monzo({
+  client_id: env.MONZO_CLIENT_ID,
+  client_secret: env.MONZO_CLIENT_SECRET
+});
 
 // Serial queue setup
 const capQueue = new Queue(async function(user, done) {
   console.log("Processing queue item...");
+
+  // Wait for any previous transactions to reflected in the balance.
+  // I'd love a better way to do this, but Monzo API responses are
+  // eventually (not immediately) consistent.
   await sleep(1000);
 
   try {
@@ -48,84 +60,74 @@ const capQueue = new Queue(async function(user, done) {
   }
 });
 
+const monzoNamespace = withNamespace("/monzo");
+
 module.exports = router(
-  post("/webhook", async (req, res) => {
-    const body = await micro.json(req);
-    console.log(`Webhook triggered for transaction: ${body.data.id}`);
+  monzoNamespace(
+    get("/auth", async (req, res) => {
+      const statusCode = 301;
 
-    const { account_id } = body.data;
-    const user = await User.findOne({ where: { account_id } });
-    if (!user) bail(`No user found for account ${account_id}`);
+      const redirect_uri = getAppUrl() + "/monzo/auth/callback";
+      const { id: state } = await State.create();
 
-    // This is queued because we receive two webhooks
-    // instead of one due to a bug. This queue has a
-    // concurrency of one, meaning we finish processing
-    // one webhook before starting on the next.
-    capQueue.push(user.get({ plain: true }));
+      const redirectURL = monzoOAuth.getAuthUrl(redirect_uri, state);
+      redirect(res, statusCode, redirectURL);
+    }),
 
-    return "ok";
-  }),
+    get("/auth/callback", async (req, res) => {
+      const { code, state } = query(req);
 
-  get("/oauth/callback", async (req, res) => {
-    const { code, state } = query(req);
+      const existingState = await State.findByPk(state);
+      if (!existingState) bail("Failed state check");
 
-    if (!code) bail('Missing query parameter "code"');
-    if (!state) bail('Missing query parameter "state"');
-    if (!(await oauth.validateState(state))) bail("Failed state check");
+      const redirect_uri = getAppUrl() + "/monzo/auth/callback";
+      const {
+        access_token,
+        expires_in,
+        refresh_token,
+        user_id
+      } = await monzoOAuth.exchangeCodeForToken(redirect_uri, code);
 
-    const {
-      access_token,
-      expires_in,
-      refresh_token,
-      user_id
-    } = await oauth.redeemAuthCode(code);
-
-    let api = new API({ access_token }, env);
-
-    const { accounts } = await api.accounts({ account_type: "uk_retail" });
-    const [mainAccount] = accounts;
-    const { id: account_id } = mainAccount;
-
-    const existingUser = await User.findOne({ where: { id: user_id } });
-
-    const expires = new Date();
-    expires.setSeconds(expires.getSeconds() + expires_in);
-
-    const fields = { access_token, account_id, expires, refresh_token };
-
-    if (existingUser) {
-      await existingUser.update(fields);
-    } else {
-      await User.create({
-        id: user_id,
-        ...fields
+      const user = await monzoOAuth.store({
+        access_token,
+        expires_in,
+        refresh_token,
+        user_id
       });
-    }
 
-    // TODO: This API reassignment once we have more data needs sorting out.
-    api = new API(fields, env);
+      const api = await user.getMonzoClient();
 
-    await registerWebhook(api, {
-      clean: true,
-      url: oauth.getAppURL() + "/webhook"
-    });
+      await api.createFeedItem({
+        type: "basic",
+        "params[title]": "Balance manager connected",
+        "params[body]": "Authorized successfully",
+        "params[image_url]": "https://i.imgur.com/tONcN2I.png"
+      });
 
-    await api.createFeedItem({
-      account_id,
-      type: "basic",
-      "params[title]": "Balance manager connected",
-      "params[body]": "Authorized successfully",
-      "params[image_url]": "https://i.imgur.com/tONcN2I.png"
-    });
+      const url = getAppUrl() + "/monzo/webhook";
+      await registerWebhook(api, { url, clean: true });
 
-    return { connected: true };
-  }),
+      return { connected: true };
+    }),
 
-  get("/", async (req, res) => {
-    const statusCode = 301;
-    const redirectURL = await oauth.getRedirectURL();
-    redirect(res, statusCode, redirectURL);
-  })
+    post("/webhook", async (req, res) => {
+      const body = await micro.json(req);
+      console.log(`Webhook triggered for transaction: ${body.data.id}`);
+
+      const { account_id } = body.data;
+      const user = await User.findOne({ where: { account_id } });
+      if (!user) bail(`No user found for account ${account_id}`);
+
+      // This is queued because we receive two webhooks
+      // instead of one due to a double webhook registration.
+      // This queue has a concurrency of one, meaning we
+      // finish processing one webhook before starting on
+      // the next.
+      capQueue.push(user);
+
+      return "ok";
+    })
+  )
 );
 
 (async function() {
