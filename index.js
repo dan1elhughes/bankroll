@@ -97,6 +97,17 @@ module.exports = router(
 
       const api = await user.getMonzoClient();
 
+      // This is a bit of a hack - assume that one user
+      // has one Retail account. This assumption might
+      // not always hold true.
+      const { accounts } = await api.accounts({ account_type: "uk_retail" });
+      const [account] = accounts;
+      const monzo_account_id = account.id;
+      api.account_id = account.id;
+      await user.update({
+        monzo_account_id
+      });
+
       await api.createFeedItem({
         type: "basic",
         "params[title]": "Balance manager connected",
@@ -114,9 +125,9 @@ module.exports = router(
       const body = await micro.json(req);
       console.log(`Webhook triggered for transaction: ${body.data.id}`);
 
-      const { account_id } = body.data;
-      const user = await User.findOne({ where: { account_id } });
-      if (!user) bail(`No user found for account ${account_id}`);
+      const monzo_account_id = body.data.account_id;
+      const user = await User.findOne({ where: { monzo_account_id } });
+      if (!user) bail(`No user found for account ${monzo_account_id}`);
 
       // This is queued because we receive two webhooks
       // instead of one due to a double webhook registration.

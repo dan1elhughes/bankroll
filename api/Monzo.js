@@ -5,17 +5,9 @@ const { toQueryParams } = require("../utils");
 const API_BASE = "https://api.monzo.com";
 
 module.exports = class API {
-  constructor({ access_token }) {
+  constructor({ access_token, account_id }) {
     this.access_token = access_token;
-  }
-
-  async withAccountId() {
-    const { accounts } = await this.accounts({
-      account_type: "uk_retail"
-    });
-    const [mainAccount] = accounts;
-    this.account_id = mainAccount.id;
-    return this;
+    this.account_id = account_id;
   }
 
   async deposit(name, amount) {

@@ -3,14 +3,18 @@ const db = require("../database");
 const { Monzo } = require("../api");
 
 class User extends Sequelize.Model {
-  async getMonzoClient() {
-    return new Monzo({ access_token: this.monzo_access_token }).withAccountId();
+  getMonzoClient() {
+    return new Monzo({
+      access_token: this.monzo_access_token,
+      account_id: this.monzo_account_id
+    });
   }
 }
 User.init(
   {
     id: { type: Sequelize.STRING, primaryKey: true },
     monzo_access_token: Sequelize.STRING,
+    monzo_account_id: Sequelize.STRING,
     monzo_expires: Sequelize.DATE,
     monzo_refresh_token: Sequelize.STRING,
 

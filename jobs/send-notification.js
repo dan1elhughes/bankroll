@@ -1,5 +1,4 @@
 const { API } = require("../api");
-const env = require("../env");
 
 const amountToString = amount => {
   const pounds = amount / 100;
@@ -11,14 +10,11 @@ const amountToString = amount => {
 };
 
 module.exports = async (user, excess) => {
-  const { account_id } = user;
-
-  const api = new API(user, env);
+  const api = user.getMonzoClient();
 
   const title = `${amountToString(excess)} saved`;
 
   return api.createFeedItem({
-    account_id,
     type: "basic",
     "params[title]": title,
     "params[body]": "Added to Pot",
