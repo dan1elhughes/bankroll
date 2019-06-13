@@ -16,22 +16,23 @@ async function creditBalance(user) {
 	const cardBalance = results[0].current * 100; // Truelayer returns this as a 2DP float.
 
 	const difference = cardBalance - potBalance;
+	const amount = Math.abs(difference);
 
 	if (difference > 0) {
-		await monzoClient.deposit(credit_pot, difference);
+		await monzoClient.deposit(credit_pot, amount);
 		return monzoClient.createFeedItem({
 			type: 'basic',
-			'params[title]': `${amountToString(difference)} saved`,
+			'params[title]': `${amountToString(amount)} saved`,
 			'params[body]': `Added to ${credit_pot}`,
 			'params[image_url]': 'https://i.imgur.com/tONcN2I.png',
 		});
 	}
 
 	if (difference < 0) {
-		await monzoClient.withdraw(credit_pot, difference);
+		await monzoClient.withdraw(credit_pot, amount);
 		return monzoClient.createFeedItem({
 			type: 'basic',
-			'params[title]': `${amountToString(difference)} added`,
+			'params[title]': `${amountToString(amount)} added`,
 			'params[body]': `Added from ${credit_pot}`,
 			'params[image_url]': 'https://i.imgur.com/tONcN2I.png',
 		});
