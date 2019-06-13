@@ -1,5 +1,5 @@
 const env = require('../env');
-const OAuth = require('../OAuth');
+const OAuth = require('../oauth');
 const { User } = require('../models');
 const bail = require('../micro/bail');
 
