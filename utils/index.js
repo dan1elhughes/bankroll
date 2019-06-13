@@ -1,2 +1,2 @@
-module.exports.toQueryParams = require("./toQueryParams");
-module.exports.getAppUrl = require("./getAppUrl");
+module.exports.toQueryParams = require('./toQueryParams');
+module.exports.getAppUrl = require('./getAppUrl');

@@ -1,6 +1,6 @@
-module.exports = message => {
-  error = new Error(message);
-  error.statusCode = 400;
-  console.error(message);
-  throw error;
+module.exports = (message, code = 400) => {
+	const error = new Error(message);
+	error.statusCode = code;
+	console.error(message);
+	throw error;
 };

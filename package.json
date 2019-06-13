@@ -1,35 +1,44 @@
 {
-  "name": "monzo-balance-manager",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "start": "micro -l tcp://0.0.0.0:$PORT",
-    "local": "nodemon --exec micro-dev",
-    "local:refresh-tokens": "node -r dotenv/config tasks/refresh_tokens.js",
-    "tasks:refresh-tokens": "node tasks/refresh_tokens.js",
-    "local:clear-hanging-auths": "node -r dotenv/config tasks/clear_hanging_auths.js",
-    "tasks:clear-hanging-auths": "node tasks/clear_hanging_auths.js",
-    "local:send-webhook": "http POST localhost:3000/monzo/webhook < sample-data/webhook.json"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "better-queue": "^3.8.10",
-    "form-data": "^2.3.3",
-    "micro": "^9.3.4",
-    "microrouter": "^3.1.3",
-    "node-fetch": "^2.6.0",
-    "pg": "^7.11.0",
-    "pg-hstore": "^2.3.3",
-    "qs": "^6.7.0",
-    "sequelize": "^5.8.7",
-    "uuid": "^3.3.2"
-  },
-  "devDependencies": {
-    "dotenv": "^8.0.0",
-    "micro-dev": "^3.0.0",
-    "nodemon": "^1.19.1"
-  }
+	"name": "monzo-balance-manager",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"start": "micro -l tcp://0.0.0.0:$PORT",
+		"local": "nodemon --exec micro-dev",
+		"local:clear-hanging-auths": "node -r dotenv/config tasks/clear_hanging_auths.js",
+		"tasks:clear-hanging-auths": "node tasks/clear_hanging_auths.js",
+		"local:connect-truelayer": "node -r dotenv/config tasks/connect_truelayer.js",
+		"tasks:connect-truelayer": "node tasks/connect_truelayer.js",
+		"local:credit-balance": "node -r dotenv/config tasks/credit_balance.js",
+		"tasks:credit-balance": "node tasks/credit_balance.js",
+		"local:refresh-tokens": "node -r dotenv/config tasks/refresh_tokens.js",
+		"tasks:refresh-tokens": "node tasks/refresh_tokens.js",
+		"local:simulate-webhook": "http POST localhost:3000/monzo/webhook < sample-data/webhook.json"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"better-queue": "^3.8.10",
+		"form-data": "^2.3.3",
+		"micro": "^9.3.4",
+		"microrouter": "^3.1.3",
+		"node-fetch": "^2.6.0",
+		"pg": "^7.11.0",
+		"pg-hstore": "^2.3.3",
+		"qs": "^6.7.0",
+		"sequelize": "^5.8.7",
+		"truelayer-client": "^1.2.1",
+		"uuid": "^3.3.2"
+	},
+	"devDependencies": {
+		"dotenv": "^8.0.0",
+		"eslint": "^5.16.0",
+		"eslint-config-prettier": "^4.3.0",
+		"eslint-plugin-prettier": "^3.1.0",
+		"micro-dev": "^3.0.0",
+		"nodemon": "^1.19.1",
+		"prettier": "^1.18.2"
+	}
 }
