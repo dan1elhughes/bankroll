@@ -1,6 +1,5 @@
 module.exports = async (api, { clean, url }) => {
 	const { webhooks } = await api.webhooks();
-	console.log({ webhooks });
 
 	if (clean) {
 		for (const webhook of webhooks) {
@@ -12,7 +11,6 @@ module.exports = async (api, { clean, url }) => {
 	}
 
 	const hook = webhooks.find(webhook => webhook.url === url);
-	console.log({ hook });
 	if (hook) return;
 
 	console.log('Hook not found. Registering...');
