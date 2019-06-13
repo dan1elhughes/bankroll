@@ -28,6 +28,25 @@ module.exports = class API {
 		});
 	}
 
+	async withdraw(name, amount) {
+		const { pots } = await this.pots();
+		const pot = pots.find(pot => pot.name === name);
+		if (!pot) throw new Error(`Pot ${name} not found`);
+
+		const { id } = pot;
+		const { account_id } = this;
+
+		const bodyParams = {
+			amount,
+			destination_account_id: account_id,
+			dedupe_id: account_id + new Date().getTime(),
+		};
+
+		return this.request('PUT', `/pots/${id}/withdraw`, {
+			bodyParams,
+		});
+	}
+
 	async balance() {
 		const { account_id } = this;
 		const queryParams = { account_id };
