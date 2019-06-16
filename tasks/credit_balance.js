@@ -11,6 +11,22 @@ async function creditBalance(user) {
 	const potBalance = pot.balance;
 
 	const truelayerClient = user.getTruelayerClient();
+
+	const newCredentials = await truelayerClient.refreshIfNeeded(
+		user.truelayer_refresh_token
+	);
+
+	if (
+		newCredentials &&
+		newCredentials.access_token !== user.truelayer_access_token
+	) {
+		truelayerClient.access_token = newCredentials.access_token;
+		await storeUpdatedTruelayerCredentials({
+			id: user.id,
+			...newCredentials,
+		});
+	}
+
 	const { results } = await truelayerClient.card();
 	if (!results.length) bail('Unable to find credit card');
 	const cardBalance = results[0].current * 100; // Truelayer returns this as a 2DP float.
@@ -48,6 +64,22 @@ function amountToString(amount) {
 	} else {
 		return `£${pounds.toFixed(2)}`;
 	}
+}
+
+async function storeUpdatedTruelayerCredentials({
+	id,
+	access_token,
+	refresh_token,
+}) {
+	const user = await User.findOne({
+		where: { id },
+	});
+	await user.update({
+		truelayer_access_token: access_token,
+		truelayer_refresh_token: refresh_token,
+	});
+
+	console.log('Refreshed Truelayer token');
 }
 
 async function main() {

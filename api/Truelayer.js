@@ -1,6 +1,5 @@
 const { DataAPIClient } = require('truelayer-client');
 const OAuth = require('../oauth');
-const { User } = require('../models');
 const env = require('../env');
 
 module.exports = class API {
@@ -10,39 +9,28 @@ module.exports = class API {
 	}
 
 	async cards() {
-		await this.refreshIfNeeded();
 		return DataAPIClient.getCards(this.access_token);
 	}
 
 	async card() {
-		await this.refreshIfNeeded();
 		return DataAPIClient.getCardBalance(this.access_token, this.account_id);
 	}
 
-	async refreshIfNeeded() {
+	async refreshIfNeeded(refresh_token) {
 		try {
 			await DataAPIClient.getMe(this.access_token);
 		} catch (e) {
 			if (e.message !== 'Invalid access token.') throw e;
+
 			console.log('Refreshing Truelayer token...');
-			const user = await User.findOne({
-				where: { truelayer_access_token: this.access_token },
-			});
 			const truelayerOAuth = new OAuth.Truelayer({
 				client_id: env.TRUELAYER_CLIENT_ID,
 				client_secret: env.TRUELAYER_CLIENT_SECRET,
 			});
-			const response = await truelayerOAuth.refreshToken(
-				user.truelayer_refresh_token
-			);
-			await user.update({
-				truelayer_access_token: response.access_token,
-				truelayer_refresh_token: response.refresh_token,
-			});
+			const response = await truelayerOAuth.refreshToken(refresh_token);
+
 			this.access_token = response.access_token;
-			console.log('Refreshed Truelayer token');
+			return response;
 		}
 	}
-
-	// TODO: Auto-refresh if expired.
 };
