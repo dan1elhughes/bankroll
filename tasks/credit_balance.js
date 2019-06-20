@@ -32,7 +32,7 @@ async function creditBalance(user) {
 	const cardBalance = results[0].current * 100; // Truelayer returns this as a 2DP float.
 
 	const difference = cardBalance - potBalance;
-	const amount = Math.abs(difference);
+	const amount = Math.round(Math.abs(difference));
 
 	if (difference > 0) {
 		await monzoClient.deposit(credit_pot, amount);
