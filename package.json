@@ -27,7 +27,7 @@
 		"node-fetch": "^2.6.0",
 		"pg": "^7.11.0",
 		"pg-hstore": "^2.3.3",
-		"qs": "^6.7.0",
+		"qs": "^6.7.3",
 		"sequelize": "^5.8.7",
 		"truelayer-client": "^1.2.1",
 		"uuid": "^3.3.2"
